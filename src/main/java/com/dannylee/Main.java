@@ -14,31 +14,20 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            File outputJson = new File(OUTPUT_JSON);
-            if (outputJson.exists()) {
-                outputJson.delete();
-            }
-            FileWriter fw = new FileWriter(outputJson);
-            fw.write("[");
-            List<String> result = batchExtract();
-            for (int i = 0; i <= result.size(); i++) {
-                String sentJson = result.get(i);
-                fw.write(sentJson);
-                if (i % 100 == 0) {
-                    fw.flush();
-                }
-            }
-            fw.write("]");
-            fw.flush();
-            fw.close();
+            batchExtract();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private static List<String> batchExtract() {
-        List<String> result = new ArrayList<>();
+    private static void batchExtract() throws IOException {
+        File outputJson = new File(OUTPUT_JSON);
+        if (outputJson.exists()) {
+            outputJson.delete();
+        }
+        FileWriter fw = new FileWriter(outputJson);
+
         File file = new File(SENTENCE_TXT_PATH);
         Gson gson = new Gson();
         try {
@@ -55,9 +44,13 @@ public class Main {
                 if (!sentResultItem.isEmpty()) {
                     String itemResult = gson.toJson(sentResultItem);
                     System.out.println(itemResult);
-                    result.add(itemResult);
+                    fw.write(itemResult + "," + "\n");
+                    fw.flush();
                 }
             }
+            fw.flush();
+            fw.close();
+
             bf.close();
             reader.close();
         } catch (FileNotFoundException e) {
@@ -65,6 +58,5 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
     }
 }
