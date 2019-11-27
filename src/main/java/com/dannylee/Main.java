@@ -29,7 +29,9 @@ public class Main {
         FileWriter fw = new FileWriter(outputJson);
 
         File file = new File(SENTENCE_TXT_PATH);
+        int totalLines = getTotalLines(file);
         Gson gson = new Gson();
+        int crtLine = 0;
         try {
             FileReader reader = new FileReader(file);
             BufferedReader bf = new BufferedReader(reader);
@@ -43,10 +45,11 @@ public class Main {
                 }
                 if (!sentResultItem.isEmpty()) {
                     String itemResult = gson.toJson(sentResultItem);
-                    System.out.println(itemResult);
                     fw.write(itemResult + "," + "\n");
                     fw.flush();
+                    System.out.println(crtLine + " " + totalLines + " " + ((float) crtLine / (float) totalLines) * 100 + " data: " + itemResult);
                 }
+                crtLine += 1;
             }
             fw.flush();
             fw.close();
@@ -58,5 +61,18 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static int getTotalLines(File file) throws IOException {
+        long startTime = System.currentTimeMillis();
+        FileReader in = new FileReader(file);
+        LineNumberReader reader = new LineNumberReader(in);
+        reader.skip(Long.MAX_VALUE);
+        int lines = reader.getLineNumber();
+        reader.close();
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("统计文件行数运行时间： " + (endTime - startTime) + "ms");
+        return lines;
     }
 }
